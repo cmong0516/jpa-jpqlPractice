@@ -1,6 +1,7 @@
 package jpql;
 
 import javax.persistence.*;
+import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -10,17 +11,28 @@ public class JpaMain {
         tx.begin();
 
         try {
+            for (int i = 0; i < 100; i++) {
+                Member member = new Member();
+                member.setUsername("member"+i);
+                member.setAge(i);
+                em.persist(member);
+            }
 
-            Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            em.persist(member);
+
+            em.flush();
+            em.clear();
 
 //            TypedQuery<Member> query = em.createQuery("select m from Member m where m.username=:username", Member.class);
 //            query.setParameter("username", "member1");
 //            Member result = query.getSingleResult();
-            Member result = em.createQuery("select m from Member m where m.username = :username", Member.class).setParameter("username", "member1").getSingleResult();
-            System.out.println("result = " + result.getUsername());
+//            Member result = em.createQuery("select m from Member m where m.username = :username", Member.class).setParameter("username", "member1").getSingleResult();
+//            System.out.println("result = " + result.getUsername());
+
+            List<Member> result = em.createQuery("select m from Member m order by m.age desc", Member.class).setFirstResult(1).setMaxResults(10).getResultList();
+
+            for (Member m : result) {
+                System.out.println(m.toString());
+            }
 
             tx.commit();
         } catch (Exception e) {
