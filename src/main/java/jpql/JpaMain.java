@@ -115,18 +115,43 @@ public class JpaMain {
             // n+1 문제를 해결하기 위해 sql 변경.
             // 3번 날아가던 쿼리가 1번만 날아감.
 
-            String sql = "select t from Team t";
-
-            List<Team> result = em.createQuery(sql, Team.class).setFirstResult(0).setMaxResults(2).getResultList();
-
-            for (Team team : result) {
-                System.out.println("team = " + team.getName());
-            }
+//            String sql = "select t from Team t";
+//
+//            List<Team> result = em.createQuery(sql, Team.class).setFirstResult(0).setMaxResults(2).getResultList();
+//
+//            for (Team team : result) {
+//                System.out.println("team = " + team.getName());
+//            }
 
             // 회원1 팀A SQL
             // 회원2 팀A 1차캐시
             // 회원3 팀B SQL
             // 회원 100명 -> N+1 발생.
+
+//            String sql = "select m from Member m where m.id = :memberId";
+//
+//            Member findMember = em.createQuery(sql, Member.class).setParameter("memberId", member1.getId()).getSingleResult();
+//
+//            System.out.println("findMember = " + findMember);
+
+//            List<Member> result = em.createNamedQuery("Member.findByUserName", Member.class).setParameter("username", "member1").getResultList();
+//
+//            System.out.println("result = " + result);
+
+            // 벌크연산 update , delete
+            // 영속성 컨텍스트를 무시하고 DB 에 직접 쿼리.
+            // 벌크연산 수행후 영속성 컨텍스트 초기화.
+            int resultCount = em.createQuery("update Member m set m.age =20").executeUpdate();
+
+            System.out.println("resultCount = " + resultCount);
+
+            em.clear();
+
+            List<Member> result = em.createQuery("select m from Member m", Member.class).getResultList();
+
+            for (Member member : result) {
+                System.out.println("member = " + member);
+            }
 
             tx.commit();
         } catch (Exception e) {
