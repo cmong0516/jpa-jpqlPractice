@@ -111,14 +111,16 @@ public class JpaMain {
             em.clear();
 
 //            String sql = "select m from Member m";
-            String sql = "select m from Member m join fetch m.team";
+//            String sql = "select m from Member m join fetch m.team";
             // n+1 문제를 해결하기 위해 sql 변경.
             // 3번 날아가던 쿼리가 1번만 날아감.
 
-            List<Member> result = em.createQuery(sql, Member.class).getResultList();
+            String sql = "select t from Team t";
 
-            for (Member member : result) {
-                System.out.println("member = " + member.getUsername() + ", " +member.getTeam().getName());
+            List<Team> result = em.createQuery(sql, Team.class).setFirstResult(0).setMaxResults(2).getResultList();
+
+            for (Team team : result) {
+                System.out.println("team = " + team.getName());
             }
 
             // 회원1 팀A SQL
@@ -141,3 +143,9 @@ public class JpaMain {
 // 서브쿼리도 가능.
 // JPA 는 select where having 절에서만 서브쿼리 사용 가능.
 // from 은 불가능.
+
+// fetch join 대상에는 별칭을 줄수 없다.
+// 둘 이상의 컬렉션은 페치조인 할수 없다.
+// 컬렉션을 패치 조인하면 페이징 api setFirstResult , setMaxResult 를 사용할수 없다.
+
+// 글로벌 로딩 전략은 모두 LAZY 를 , 최적화가 필요한 곳만 페치조인을 사용.
